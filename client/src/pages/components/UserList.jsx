@@ -4,7 +4,7 @@ import { fetchUsers, createUser, updateUser, deleteUser } from '@/pages/api/hell
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState({ name: '', email: '', age: '' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'user', age: '' });
     const [editingUser, setEditingUser] = useState(null);
 
     useEffect(() => {
@@ -24,16 +24,12 @@ const UserList = () => {
         e.preventDefault();
         try {
             if (editingUser) {
-                console.log('Updating user:', editingUser._id, newUser);
                 await updateUser(editingUser._id, newUser);
-                console.log('User updated successfully');
             } else {
-                console.log('Creating user:', newUser);
                 await createUser(newUser);
-                console.log('User created successfully');
             }
             fetchUserList();
-            setNewUser({ name: '', email: '', age: '' });
+            setNewUser({ name: '', email: '', password: '', role: 'user', age: '' });
             setEditingUser(null);
         } catch (error) {
             console.error('Error saving user:', error.response ? error.response.data : error.message);
@@ -47,9 +43,7 @@ const UserList = () => {
 
     const handleDelete = async (userId) => {
         try {
-            console.log('Deleting user:', userId);
             await deleteUser(userId);
-            console.log('User deleted successfully');
             fetchUserList();
         } catch (error) {
             console.error('Error deleting user:', error.response ? error.response.data : error.message);
@@ -64,6 +58,8 @@ const UserList = () => {
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Password</th>
+                        <th>Role</th>
                         <th>Age</th>
                         <th>Actions</th>
                     </tr>
@@ -73,6 +69,8 @@ const UserList = () => {
                         <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
+                            <td>{user.password}</td>
+                            <td>{user.role}</td>
                             <td>{user.age}</td>
                             <td>
                                 <button className="btn btn-sm btn-primary mr-2" onClick={() => handleEdit(user)}>Edit</button>
@@ -88,7 +86,7 @@ const UserList = () => {
                 <div className="form-group">
                     <input
                         type="text"
-                        className="form-control"
+                        className="form-control mb-2"
                         placeholder="Name"
                         value={newUser.name}
                         onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
@@ -98,7 +96,7 @@ const UserList = () => {
                 <div className="form-group">
                     <input
                         type="email"
-                        className="form-control"
+                        className="form-control mb-2"
                         placeholder="Email"
                         value={newUser.email}
                         onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
@@ -107,11 +105,33 @@ const UserList = () => {
                 </div>
                 <div className="form-group">
                     <input
+                        type="password"
+                        className="form-control mb-2"
+                        placeholder="Password"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <select
+                        className="form-control mb-2"
+                        value={newUser.role}
+                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                        required
+                    >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div className="form-group">
+                    <input
                         type="number"
-                        className="form-control"
+                        className="form-control mb-2"
                         placeholder="Age"
                         value={newUser.age}
                         onChange={(e) => setNewUser({ ...newUser, age: e.target.value })}
+                        required
                     />
                 </div>
                 <button type="submit" className="btn btn-success">

@@ -19,7 +19,11 @@ export default function Home({ isLoggedIn, login }) {
     return null; // or a loading indicator
   }
 
-  return <Login login={login} />;
+  return (
+    <div>
+      <Login login={login} />
+    </div>
+  );
 }
 
 // ... Add LoginForm, AdminDashboard, and UserDashboard components here ...
