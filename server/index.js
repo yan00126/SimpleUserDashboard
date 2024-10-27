@@ -15,9 +15,10 @@ mongoose
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
-// Route: Create user
+// Route: Create user (admin only)
 app.post('/users', async (req, res) => {
     try {
+        // TODO: Add authentication middleware to ensure only admins can access this route
         const user = new User(req.body);
         await user.save();
         res.status(201).send(user);
@@ -30,7 +31,7 @@ app.post('/users', async (req, res) => {
 app.get('/users', async (req, res) => {
     try {
         const users = await User.find();
-        res.status(200).send(users);
+        res.send(users);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
@@ -39,7 +40,12 @@ app.get('/users', async (req, res) => {
 // Route: Update user
 app.put('/users/:id', async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const { name, email, password, role, age } = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.params.id, 
+            { name, email, password, role, age }, 
+            { new: true, runValidators: true }
+        );
         if (!user) {
             return res.status(404).send({ error: 'User not found' });
         }
@@ -62,8 +68,30 @@ app.delete('/users/:id', async (req, res) => {
     }
 });
 
+// Route: User login
+app.post('/login', async (req, res) => {
+    try {
+        const { name, password } = req.body;
+        const user = await User.findOne({ name });
+        if (!user || user.password !== password) {
+            return res.status(401).send({ error: 'Invalid credentials' });
+        }
+        res.send({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// const adminUser = new User({
+//   name: 'admin',
+//   email: 'admin@example.com',
+//   password: 'admin123',
+//   role: 'admin'
+// });
+// await adminUser.save();
