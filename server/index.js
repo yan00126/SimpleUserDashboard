@@ -114,10 +114,3 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
-// const adminUser = new User({
-//   name: 'admin1',
-//   email: 'admin1@example.com',
-//   password: 'admin123',
-//   role: 'admin'
-// });
-// await adminUser.save();
