@@ -10,9 +10,35 @@ const cors = require('cors');
 app.use(cors()); // Allow all origins (you may want to configure this for production)
 
 // Connect to MongoDB
+// mongoose
+//     .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then(() => console.log('Connected to MongoDB'))
+//     .catch((err) => console.error('Failed to connect to MongoDB:', err));
+
 mongoose
     .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Connected to MongoDB'))
+    .then(async () => {
+        console.log('Connected to MongoDB');
+
+        // Create an admin user after a successful connection
+        try {
+            const existingAdmin = await User.findOne({ email: 'admin1@example.com' });
+            if (!existingAdmin) {
+                const adminUser = new User({
+                    name: 'admin1',
+                    email: 'admin1@example.com',
+                    password: 'admin123',
+                    role: 'admin'
+                });
+                await adminUser.save();
+                console.log('Admin user created successfully');
+            } else {
+                console.log('Admin user already exists');
+            }
+        } catch (error) {
+            console.error('Error creating admin user:', error.message);
+        }
+    })
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
 // Route: Create user (admin only)
@@ -89,8 +115,8 @@ app.listen(PORT, () => {
 });
 
 // const adminUser = new User({
-//   name: 'admin',
-//   email: 'admin@example.com',
+//   name: 'admin1',
+//   email: 'admin1@example.com',
 //   password: 'admin123',
 //   role: 'admin'
 // });

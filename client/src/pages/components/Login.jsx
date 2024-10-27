@@ -6,6 +6,7 @@ import axios from 'axios';
 function Login({ login }) {
   const [name, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -20,30 +21,35 @@ function Login({ login }) {
         router.push('/user-dashboard');
       }
     } catch (error) {
-      alert('Invalid username or password');
+      setErrorMessage('Invalid username or password');
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4" style={{ width: '300px' }}>
-        <h2 className="text-center mb-4">Login</h2>
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundImage: 'url("/login-background.jpg")', backgroundSize: 'cover' }}>
+      <div className="card p-5 shadow-lg" style={{ width: '350px', borderRadius: '10px' }}>
+        <h2 className="text-center mb-4 text-primary">Login</h2>
+        {errorMessage && <div className="alert alert-danger text-center">{errorMessage}</div>}
         <form onSubmit={handleLogin}>
           <div className="form-group">
+            <label htmlFor="username" className="font-weight-bold">Username</label>
             <input
               type="text"
+              id="username"
               className="form-control mb-3"
-              placeholder="Username"
+              placeholder="Enter your username"
               value={name}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
+            <label htmlFor="password" className="font-weight-bold">Password</label>
             <input
               type="password"
+              id="password"
               className="form-control mb-3"
-              placeholder="Password"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
