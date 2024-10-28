@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Link from 'next/link';
 
 function Login({ login }) {
   const [name, setUsername] = useState('');
@@ -15,9 +16,15 @@ function Login({ login }) {
       const response = await axios.post('http://localhost:5000/login', { name, password });
       const user = response.data.user;
       login(user.name, user.role);
+      console.log(user.role);
+      
       if (user.role === 'admin') {
+        console.log('admin1111');
         router.push('/admin-dashboard');
+        // <Link href={'/admin-dashboard'}></Link>
       } else {
+        console.log('user1111');
+        // <Link href={'/user-dashboard'}></Link>
         router.push('/user-dashboard');
       }
     } catch (error) {

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from 'react';
 import { fetchUsers, createUser, updateUser, deleteUser } from '@/pages/api/hello';
 import 'bootstrap/dist/css/bootstrap.min.css';

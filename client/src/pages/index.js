@@ -15,9 +15,8 @@ const geistMono = localFont({
 });
 
 export default function Home({ isLoggedIn, login }) {
-  if (isLoggedIn) {
-    return null; // or a loading indicator
-  }
+
+  
 
   return (
     <div>
