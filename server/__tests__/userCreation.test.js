@@ -1,20 +1,23 @@
-const app = require('../server/index'); // Corrected path to server/index.js
-const User = require('../server/models/user'); // Corrected path to user model
-
+const app = require('../index.js'); 
+const User = require('../models/user.js');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
 
-// Before running any test, spin up the in-memory server and connect to it
+let connection;
+
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    connection = await mongoose.createConnection(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+    mongoose.connection = connection; // Set the test connection
 });
 
-// After running all tests, disconnect and stop the server
 afterAll(async () => {
     await mongoose.disconnect();
     await mongoServer.stop();
@@ -28,7 +31,7 @@ afterEach(async () => {
 describe('User Creation Endpoint', () => {
     it('should create a new user successfully', async () => {
         const newUser = {
-            name: 'John Doe',
+            name: 'JohnDoe',
             email: 'john@example.com',
             password: 'password123',
             role: 'user'
@@ -72,5 +75,28 @@ describe('User Creation Endpoint', () => {
 
         expect(response.body).toHaveProperty('error');
         expect(response.body.error).toContain('validation failed');
+    });
+
+    it('should fail to create a user with a duplicate email', async () => {
+        const existingUser = {
+            name: 'Existing User',
+            email: 'duplicate@example.com',
+            password: 'password123',
+            role: 'user'
+        };
+
+        // Create the first user
+        await request(app)
+            .post('/users')
+            .send(existingUser)
+            .expect(201);
+
+        // Attempt to create a user with the same email
+        const response = await request(app)
+            .post('/users')
+            .send({ ...existingUser, name: 'Another User' }) // Different name, same email
+            .expect(400);
+
+        expect(response.body).toHaveProperty('error');
     });
 });
